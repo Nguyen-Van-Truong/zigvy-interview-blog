@@ -1,4 +1,5 @@
 const Comment = require('../models/commentModel');
+const User = require('../models/userModel');
 
 exports.getComments = async (req, res) => {
     try {
@@ -11,12 +12,26 @@ exports.getComments = async (req, res) => {
 
 exports.getCommentsByPostId = async (req, res) => {
     try {
-        const comments = await Comment.find({ post: req.params.postId });
-        res.json(comments);
+        const comments = await Comment.find({ post: req.params.postId }).sort({ created_at: -1 });
+        const userIds = comments.map(comment => comment.owner);
+        const users = await User.find({ id: { $in: userIds } }, 'id name');
+
+        const userMap = {};
+        users.forEach(user => {
+            userMap[user.id] = user.name;
+        });
+
+        const commentsWithUserNames = comments.map(comment => ({
+            ...comment.toObject(),
+            ownerName: userMap[comment.owner] || 'Unknown'
+        }));
+
+        res.json(commentsWithUserNames);
     } catch (error) {
         res.status(500).json({ message: 'Server error: ' + error });
     }
 };
+
 
 exports.createComment = async (req, res) => {
     const { owner, post, content } = req.body;

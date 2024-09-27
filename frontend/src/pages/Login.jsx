@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Typography, Card, Alert } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import {useState} from 'react';
+import {Form, Input, Button, Typography, Card, Alert} from 'antd';
+import {UserOutlined, LockOutlined} from '@ant-design/icons';
 
-const { Title } = Typography;
+const {Title} = Typography;
 
 const Login = () => {
     const [loading, setLoading] = useState(false);
@@ -12,20 +12,36 @@ const Login = () => {
         setLoading(true);
         setError(null);
 
-        // Fake login logic here. Replace with actual API request
-        const { username, password } = values;
+        const {username, password} = values;
 
-        // Mock API call (Replace with actual API)
-        setTimeout(() => {
-            setLoading(false);
-            if (username !== 'admin' || password !== '123456') {
-                setError('Invalid username or password');
-            } else {
-                // Redirect or handle successful login
-                console.log('Login successful');
-                setError(null);
+        try {
+            const response = await fetch('http://localhost:3000/api/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({username, password}),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Login failed');
             }
-        }, 1000);
+
+            const data = await response.json();
+            console.log('Login successful:', data);
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('name', data.name);
+
+            window.location.href = '/';
+
+        } catch (error) {
+            console.error('Error during login:', error);
+            setError(error.message || 'Something went wrong!');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -35,15 +51,19 @@ const Login = () => {
             alignItems: 'center',
             height: '100vh',
             backgroundColor: '#f0f2f5',
-            padding: '40px',  // Tăng thêm padding để trang thoáng hơn
+            padding: '40px',
         }}>
             <Card style={{
-                width: 500,  // Tăng thêm chiều rộng
-                padding: '60px',  // Thêm padding để thẻ lớn hơn
-                borderRadius: '10px',  // Làm góc tròn mượt hơn
-                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',  // Thêm hiệu ứng đổ bóng để nhìn hiện đại hơn
+                width: 500,
+                padding: '60px',
+                borderRadius: '10px',
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
             }}>
-                <Title level={1} style={{ textAlign: 'center', fontSize: '40px', marginBottom: '40px' }}> {/* Tăng kích thước tiêu đề */}
+                <Title level={1} style={{
+                    textAlign: 'center',
+                    fontSize: '40px',
+                    marginBottom: '40px'
+                }}>
                     Login
                 </Title>
 
@@ -55,40 +75,40 @@ const Login = () => {
                         type="error"
                         showIcon
                         closable
-                        style={{ marginBottom: 24 }}
+                        style={{marginBottom: 24}}
                     />
                 )}
 
                 <Form
                     name="login"
-                    initialValues={{ remember: true }}
+                    initialValues={{remember: true}}
                     onFinish={onFinish}
-                    layout="vertical"  // Giữ layout dọc
-                    size="large"  // Tăng kích thước input và các thành phần form
+                    layout="vertical"
+                    size="large"
                 >
                     <Form.Item
                         name="username"
-                        label={<span style={{ fontSize: '20px' }}>Username</span>}  // Tăng kích thước label
-                        rules={[{ required: true, message: 'Please enter your username!' }]}
+                        label={<span style={{fontSize: '20px'}}>Username</span>}
+                        rules={[{required: true, message: 'Please enter your username!'}]}
                     >
                         <Input
-                            size="large"  // Tăng kích thước input
-                            prefix={<UserOutlined style={{ fontSize: '20px' }} />}  // Tăng kích thước icon
+                            size="large"
+                            prefix={<UserOutlined style={{fontSize: '20px'}}/>}
                             placeholder="Enter your username"
-                            style={{ height: '50px', fontSize: '18px' }}  // Tăng chiều cao input và kích thước chữ
+                            style={{height: '50px', fontSize: '18px'}}
                         />
                     </Form.Item>
 
                     <Form.Item
                         name="password"
-                        label={<span style={{ fontSize: '20px' }}>Password</span>}  // Tăng kích thước label
-                        rules={[{ required: true, message: 'Please enter your password!' }]}
+                        label={<span style={{fontSize: '20px'}}>Password</span>}
+                        rules={[{required: true, message: 'Please enter your password!'}]}
                     >
                         <Input.Password
                             size="large"
-                            prefix={<LockOutlined style={{ fontSize: '20px' }} />}  // Tăng kích thước icon
+                            prefix={<LockOutlined style={{fontSize: '20px'}}/>}
                             placeholder="Enter your password"
-                            style={{ height: '50px', fontSize: '18px' }}  // Tăng chiều cao input và kích thước chữ
+                            style={{height: '50px', fontSize: '18px'}}
                         />
                     </Form.Item>
 
@@ -100,9 +120,9 @@ const Login = () => {
                             size="large"
                             loading={loading}
                             style={{
-                                height: '55px',  // Tăng chiều cao nút
-                                fontSize: '18px',  // Tăng kích thước chữ
-                                borderRadius: '8px',  // Làm nút tròn mượt hơn
+                                height: '55px',
+                                fontSize: '18px',
+                                borderRadius: '8px',
                             }}
                         >
                             Log In

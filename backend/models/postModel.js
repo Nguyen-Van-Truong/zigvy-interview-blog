@@ -1,7 +1,6 @@
 // E:\ZigvyInterviewBlog\backend\models\postModel.js
 const mongoose = require('mongoose');
 
-// Tạo schema cho Post
 const postSchema = mongoose.Schema(
     {
         id: {

@@ -1,9 +1,22 @@
 const Post = require('../models/postModel');
 
 exports.getPosts = async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+    const limit = parseInt(req.query.limit) || 10; // Số lượng bài viết mỗi trang, mặc định là 10
+
     try {
-        const posts = await Post.find({});
-        res.json(posts);
+        const totalPosts = await Post.countDocuments(); // Tổng số bài viết
+        const posts = await Post.find({})
+            .sort({ created_at: -1 }) // Sắp xếp bài viết mới nhất
+            .skip((page - 1) * limit) // Bỏ qua các bài viết của các trang trước
+            .limit(limit); // Giới hạn số bài viết mỗi trang
+
+        res.json({
+            posts, // Trả về các bài viết
+            currentPage: page, // Trang hiện tại
+            totalPages: Math.ceil(totalPosts / limit), // Tổng số trang
+            hasMore: page < Math.ceil(totalPosts / limit), // Kiểm tra xem còn dữ liệu hay không
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error: ' + error });
     }

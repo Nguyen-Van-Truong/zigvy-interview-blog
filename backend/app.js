@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var connectDB = require('./config/db');
+var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/userRoutes');
@@ -11,6 +12,8 @@ var postsRouter = require('./routes/postRoutes');
 var commentsRouter = require('./routes/commentRoutes');
 
 var app = express();
+
+app.use(cors());
 
 connectDB();
 

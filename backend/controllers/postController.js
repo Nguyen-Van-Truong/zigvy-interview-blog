@@ -5,10 +5,17 @@ const User = require('../models/userModel');
 exports.getPosts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || '';
 
     try {
-        const totalPosts = await Post.countDocuments();
-        const posts = await Post.find({})
+        const query = {};
+        if (search) {
+            query.title = {$regex: search, $options: 'i'};
+        }
+
+        const totalPosts = await Post.countDocuments(query);
+
+        const posts = await Post.find(query)
             .sort({created_at: -1})
             .skip((page - 1) * limit)
             .limit(limit);

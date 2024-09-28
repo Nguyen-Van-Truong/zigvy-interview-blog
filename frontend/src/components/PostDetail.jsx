@@ -4,6 +4,7 @@ import {useParams} from 'react-router-dom';
 import {Layout, Typography, Skeleton, Button, Form, Input} from 'antd';
 import CommentsSection from './CommentsSection';
 import HeaderComponent from './HeaderComponent';
+import {fetchPostDetailApi, fetchCommentsApi, addCommentApi} from '../api/postApi';
 
 const {Content} = Layout;
 const {Title, Text} = Typography;
@@ -28,16 +29,14 @@ const PostDetail = () => {
 
     const fetchPostDetail = async (postId) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/posts/${postId}`);
-            const result = await response.json();
+            setLoading(true);
+            const result = await fetchPostDetailApi(postId);
             setPost(result);
-            setLoading(false);
-
             if (result.id) {
-                const commentsResponse = await fetch(`http://localhost:3000/api/comments/post/${result.id}`);
-                const commentsResult = await commentsResponse.json();
+                const commentsResult = await fetchCommentsApi(result.id);
                 setComments(commentsResult);
             }
+            setLoading(false);
         } catch (error) {
             console.error("Error loading post:", error);
             setLoading(false);
@@ -53,29 +52,18 @@ const PostDetail = () => {
 
     const handleAddComment = async (values) => {
         try {
-            const response = await fetch('http://localhost:3000/api/comments', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    owner: 2,
-                    post: post.id,
-                    content: values.content,
-                }),
+            const newComment = await addCommentApi({
+                owner: 2,
+                post: post.id,
+                content: values.content,
             });
 
-            if (response.ok) {
-                const newComment = await response.json();
-                const commentWithUsername = {
-                    ...newComment,
-                    ownerName: username,
-                };
-                setComments((prevComments) => [...prevComments, commentWithUsername]);
-                form.resetFields();
-            } else {
-                console.error("Error adding comment");
-            }
+            const commentWithUsername = {
+                ...newComment,
+                ownerName: username,
+            };
+            setComments((prevComments) => [...prevComments, commentWithUsername]);
+            form.resetFields();
         } catch (error) {
             console.error("Error adding comment:", error);
         }
@@ -98,7 +86,7 @@ const PostDetail = () => {
                         </div>
                         <div>
                             <Title level={4}>Tags</Title>
-                            {post.tags.map((tag, index) => (
+                            {post.tags && post.tags.map((tag, index) => (
                                 <Button key={index} type="dashed" style={{marginRight: '10px'}}>
                                     {tag}
                                 </Button>

@@ -7,7 +7,10 @@ import {useNavigate} from 'react-router-dom';
 const {Title, Text} = Typography;
 const {Header} = Layout;
 
-const HeaderComponent = ({token, username, handleLogout}) => {
+const HeaderComponent = ({
+                             token = '', username = '', handleLogout = () => {
+    }
+                         }) => {
     const navigate = useNavigate();
 
     const handleLogin = () => {
@@ -22,7 +25,7 @@ const HeaderComponent = ({token, username, handleLogout}) => {
             justifyContent: 'space-between',
             alignItems: 'center'
         }}>
-            <Title level={3} style={{color: '#fff', margin: 0}}>Blog Posts</Title>
+            <Title level={3} style={{color: '#fff', margin: 0}}>My Blog</Title>
             <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                 {token ? (
                     <>
@@ -46,11 +49,6 @@ HeaderComponent.propTypes = {
     token: PropTypes.string,
     username: PropTypes.string,
     handleLogout: PropTypes.func.isRequired,
-};
-
-HeaderComponent.defaultProps = {
-    token: '',
-    username: '',
 };
 
 export default HeaderComponent;

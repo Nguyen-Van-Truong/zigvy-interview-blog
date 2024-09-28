@@ -1,3 +1,4 @@
+// E:\zigvy\truong_2024_2\zigvy-interview-blog\frontend\src\api\userApi.js
 import BASE_URL from '../config/apiConfig';
 
 export const loginUser = async (payload) => {

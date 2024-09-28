@@ -7,7 +7,10 @@ import {useNavigate} from 'react-router-dom';
 
 const {Text} = Typography;
 
-const PostCard = ({post, loading, visibleComments, toggleComments, getPostComments}) => {
+const PostCard = ({
+                      post, loading = false, visibleComments = {}, toggleComments = () => {
+    }, getPostComments = () => []
+                  }) => {
     const navigate = useNavigate();
 
     const formatDate = (timestamp) => {

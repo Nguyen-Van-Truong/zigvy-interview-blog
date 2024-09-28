@@ -1,47 +1,18 @@
-import {useState} from 'react';
-import {Form, Input, Button, Typography, Card, Alert} from 'antd';
-import {UserOutlined, LockOutlined} from '@ant-design/icons';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Form, Input, Button, Typography, Card, Alert } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { loginRequest } from '../redux/slices/userSlice';
 
-const {Title} = Typography;
+const { Title } = Typography;
 
 const Login = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.user);
 
-    const onFinish = async (values) => {
-        setLoading(true);
-        setError(null);
-
-        const {username, password} = values;
-
-        try {
-            const response = await fetch('http://localhost:3000/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({username, password}),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Login failed');
-            }
-
-            const data = await response.json();
-            console.log('Login successful:', data);
-
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('name', data.name);
-
-            window.location.href = '/';
-
-        } catch (error) {
-            console.error('Error during login:', error);
-            setError(error.message || 'Something went wrong!');
-        } finally {
-            setLoading(false);
-        }
+    const onFinish = (values) => {
+        const { username, password } = values;
+        dispatch(loginRequest({ username, password }));
     };
 
     return (
@@ -67,7 +38,6 @@ const Login = () => {
                     Login
                 </Title>
 
-                {/* Error Message */}
                 {error && (
                     <Alert
                         message="Error"
@@ -75,40 +45,40 @@ const Login = () => {
                         type="error"
                         showIcon
                         closable
-                        style={{marginBottom: 24}}
+                        style={{ marginBottom: 24 }}
                     />
                 )}
 
                 <Form
                     name="login"
-                    initialValues={{remember: true}}
+                    initialValues={{ remember: true }}
                     onFinish={onFinish}
                     layout="vertical"
                     size="large"
                 >
                     <Form.Item
                         name="username"
-                        label={<span style={{fontSize: '20px'}}>Username</span>}
-                        rules={[{required: true, message: 'Please enter your username!'}]}
+                        label={<span style={{ fontSize: '20px' }}>Username</span>}
+                        rules={[{ required: true, message: 'Please enter your username!' }]}
                     >
                         <Input
                             size="large"
-                            prefix={<UserOutlined style={{fontSize: '20px'}}/>}
+                            prefix={<UserOutlined style={{ fontSize: '20px' }} />}
                             placeholder="Enter your username"
-                            style={{height: '50px', fontSize: '18px'}}
+                            style={{ height: '50px', fontSize: '18px' }}
                         />
                     </Form.Item>
 
                     <Form.Item
                         name="password"
-                        label={<span style={{fontSize: '20px'}}>Password</span>}
-                        rules={[{required: true, message: 'Please enter your password!'}]}
+                        label={<span style={{ fontSize: '20px' }}>Password</span>}
+                        rules={[{ required: true, message: 'Please enter your password!' }]}
                     >
                         <Input.Password
                             size="large"
-                            prefix={<LockOutlined style={{fontSize: '20px'}}/>}
+                            prefix={<LockOutlined style={{ fontSize: '20px' }} />}
                             placeholder="Enter your password"
-                            style={{height: '50px', fontSize: '18px'}}
+                            style={{ height: '50px', fontSize: '18px' }}
                         />
                     </Form.Item>
 

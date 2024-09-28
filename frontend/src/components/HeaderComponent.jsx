@@ -1,3 +1,4 @@
+// E:\zigvy\truong_2024_2\zigvy-interview-blog\frontend\src\components\HeaderComponent.jsx
 import PropTypes from 'prop-types';
 import {Button, Typography, Layout} from 'antd';
 import {LogoutOutlined} from '@ant-design/icons';

@@ -1,3 +1,4 @@
+// E:\zigvy\truong_2024_2\zigvy-interview-blog\backend\controllers\postController.js
 const Post = require('../models/postModel');
 const Comment = require('../models/commentModel');
 const User = require('../models/userModel');
